@@ -1,0 +1,9 @@
+ml-dtypes
+numpy
+opencv-python
+opt-einsum
+scipy
+rule_engine
+scikit-learn
+matplotlib
+tensorflow
