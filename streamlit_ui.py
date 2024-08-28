@@ -11,6 +11,6 @@ def sidebar_controls():
     return num_particles, num_types, dt, r, friction_factor, beta
 
 def main_controls():
-    run_simulation = st.button("Run Simulation")
-    stop_simulation = st.button("Quit Simulation")
+    run_simulation = st.button("Run Simulation", key="run_simulation_btn")
+    stop_simulation = st.button("Quit Simulation", key="quit_simulation_btn")
     return run_simulation, stop_simulation

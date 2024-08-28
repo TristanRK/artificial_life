@@ -1,31 +1,10 @@
-import streamlit as st
 import cv2
 import numpy as np
 import math
 import random
-import time  # Add time for control of frame rate
+import streamlit as st
 
-# Define simulation parameters
-X = 1600 // 2
-Y = 2560 // 2
-num_particles = 200
-num_types = 5
-dt = 0.02
-window = np.zeros((X, Y, 3), dtype=np.uint8)  # Ensure dtype is uint8 for image display
-
-colour_dict = {0: (255, 0, 0), 1: (0, 255, 0), 2: (0, 0, 255), 3: (155, 0, 155), 4: (0, 155, 155)}
-particle_types = [random.randint(0, num_types - 1) for _ in range(num_particles)]
-particle_pos_x = [random.randint(5, X - 5) for _ in range(num_particles)]
-particle_pos_y = [random.randint(5, Y - 5) for _ in range(num_particles)]
-p_v_x = [(random.random() + 100) * 2 for _ in range(num_particles)]
-p_v_y = [(random.random() + 100) * 2 for _ in range(num_particles)]
-forces = [[(random.random() + 5) * 2 for _ in range(num_types)] for _ in range(num_types)]
-r = 80
-friction_factor = 0.3
-
-# Function to calculate forces
-def calc_forces(dist, force):
-    beta = 0.3
+def calc_forces(dist, force, beta):
     if dist < beta:
         return dist / beta - 1
     elif beta < dist < 1:
@@ -33,18 +12,21 @@ def calc_forces(dist, force):
     else:
         return 0
 
-# Streamlit UI
-st.title("Particle Simulation App")
+def run_simulation(num_particles, num_types, dt, r, friction_factor, beta, image_placeholder):
+    # Simulation setup
+    X = 1600 // 2
+    Y = 2560 // 2
+    window = np.zeros((X, Y, 3), dtype=np.uint8)
+    colour_dict = {0: (255, 0, 0), 1: (0, 255, 0), 2: (0, 0, 255), 3: (155, 0, 155), 4: (0, 155, 155)}
 
-# Streamlit button to control the simulation
-run_simulation = st.button("Run Simulation")
-stop_simulation = st.button("Quit Simulation")
+    particle_types = [random.randint(0, num_types - 1) for _ in range(num_particles)]
+    particle_pos_x = [random.randint(5, X - 5) for _ in range(num_particles)]
+    particle_pos_y = [random.randint(5, Y - 5) for _ in range(num_particles)]
+    p_v_x = [(random.random() + 100) * 2 for _ in range(num_particles)]
+    p_v_y = [(random.random() + 100) * 2 for _ in range(num_particles)]
+    forces = [[(random.random() + 5) * 2 for _ in range(num_types)] for _ in range(num_types)]
 
-# Placeholder for the image
-image_placeholder = st.empty()
-
-if run_simulation:
-    while not stop_simulation:
+    while True:
         window[:, :, :] = 0  # Clear the window
 
         for i in range(num_particles):
@@ -60,7 +42,7 @@ if run_simulation:
                         dy = (abs(dy) - Y) * (dy / abs(dy))
                     dist = math.sqrt(dx ** 2 + dy ** 2)
                     if 0 < dist < r:
-                        force = calc_forces(dist / r, forces[particle_types[i]][particle_types[j]])
+                        force = calc_forces(dist / r, forces[particle_types[i]][particle_types[j]], beta)
                         tot_force_x += dx / dist * force
                         tot_force_y += dy / dist * force
 
@@ -78,15 +60,11 @@ if run_simulation:
 
         # Convert BGR to RGB for Streamlit
         img_rgb = cv2.cvtColor(window, cv2.COLOR_BGR2RGB)
-
         # Display the image in Streamlit
         image_placeholder.image(img_rgb, channels="RGB")
 
-        # Add a small delay to control the simulation speed
-        time.sleep(0.03)
-
-        # Check for quit button press
-        if st.session_state.get('stop_simulation'):
+        # Check if the simulation should stop
+        if st.session_state['stop_simulation']:
             break
 
     cv2.destroyAllWindows()

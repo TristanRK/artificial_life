@@ -1,6 +1,7 @@
 import streamlit as st
 from simulation import run_simulation
-from ui import sidebar_controls, main_controls
+from streamlit_ui import sidebar_controls, main_controls
+import cv2
 
 # Streamlit UI setup
 st.title("Modularized Particle Simulation App")
@@ -23,7 +24,11 @@ image_placeholder = st.empty()
 if run_simulation_btn:
     st.session_state['run_simulation'] = True
     st.session_state['stop_simulation'] = False
-    run_simulation(num_particles, num_types, dt, r, friction_factor, beta, image_placeholder)
+    # Ensure run_simulation is a function
+    if callable(run_simulation):
+        run_simulation(num_particles, num_types, dt, r, friction_factor, beta, image_placeholder)
+    else:
+        st.error("Error: 'run_simulation' is not callable.")
 
 if quit_simulation_btn:
     st.session_state['run_simulation'] = False

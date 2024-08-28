@@ -7,3 +7,4 @@ rule_engine
 scikit-learn
 matplotlib
 tensorflow
+streamlit
