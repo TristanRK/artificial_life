@@ -6,10 +6,11 @@ import streamlit as st
 
 def calc_forces(dist, force, beta):
     '''
-    The calculation of force is determined by the beta value which helps determine how forces are applied to the particles. 
-    As two particles are within the beta distance then a negative force is applied on each other. This means that they are 
-    attracted rather than repulsed. If two particles are a larger distance away from each other than beta but still less that 1 unit distance, then they 
-    repulse each other as the force value is positive. 
+    The calculation of force is determined by the beta value which helps determine how forces 
+    are applied to the particles. As two particles are within the beta distance then a negative 
+    force is applied on each other. This means that they are attracted rather than repulsed. 
+    If two particles are a larger distance away from each other than beta but still less 
+    that 1 unit distance, then they repulse each other as the force value is positive. 
     
     Parameters:
     ------------
@@ -21,6 +22,8 @@ def calc_forces(dist, force, beta):
         return dist / beta - 1 ## creates an attraction force because it ends up being negative and so is not pushing particles away from each other
     elif beta < dist < 1:
         return force * (1 - abs(2 * dist - 1 - beta) / (1 - beta)) ## the max force is 1 if the absolute function is 0.
+    elif 1 < dist:
+        return 10 * ((random.randint(1,3))/(dist ** 2)) ## Applying force on particles over long distances
     else:
         return 0
     
@@ -29,7 +32,6 @@ def calc_forces(dist, force, beta):
 def run_simulation(num_particles, num_types, dt, r, friction_factor, beta, image_placeholder):
     """
     Runs a particle simulation with specified parameters and visualizes it using Streamlit.
-
     The simulation involves particles of different types moving within a bounded window,
     influenced by forces based on their distances and interactions with other particles.
     The particles are rendered in real-time and displayed through an image placeholder.
@@ -67,8 +69,8 @@ def run_simulation(num_particles, num_types, dt, r, friction_factor, beta, image
     particle_types = [random.randint(0, num_types - 1) for _ in range(num_particles)]
     particle_pos_x = [random.randint(5, X - 5) for _ in range(num_particles)] ## within the borders of the window
     particle_pos_y = [random.randint(5, Y - 5) for _ in range(num_particles)] ## within the borders of the window
-    p_v_x = [(random.random() * 2) * 2 for _ in range(num_particles)] ## initial velocity is random between 0 and 20 and then multiplied by 2.
-    p_v_y = [(random.random() * 2) * 2 for _ in range(num_particles)] ## initial velocity is random between 0 and 20 and then multiplied by 2.
+    p_v_x = [(random.random() - 0.5) * 2 for _ in range(num_particles)] ## initial velocity is random between 0 and 20 and then multiplied by 2.
+    p_v_y = [(random.random() - 0.5) * 2 for _ in range(num_particles)] ## initial velocity is random between 0 and 20 and then multiplied by 2.
     forces = [[(random.random() - 0.5) * 2 for _ in range(num_types)] for _ in range(num_types)] ## creates a 5 by 5 force matrix between particle types.
 
     while True:
